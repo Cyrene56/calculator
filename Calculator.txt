@@ -1,0 +1,142 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+public class Calculator {
+    public JFrame frame;            // 窗口
+    public JTextField textField;    // 文本框
+    public JButton[] buttons;       // 按钮
+    public JPanel panel;            // 面板
+    public String[] buttonArr = {"%", "DEL", "C", "+", "7", "8", "9", "-", "4", "5", "6", "×", "1", "2", "3", "÷", "+/-", "0", ".", "="};
+    public String information = "";  // 文本框里的信息
+    public String a, b, operate;      // 运算符前的字符，运算符后的字符，运算符
+    public double result;            // double类型计算结果
+
+    // 初始化计算器界面
+    public void init() {
+        frame = new JFrame("简易计算器");  // 创建窗口
+        textField = new JTextField();     // 创建文本框
+        panel = new JPanel();              // 创建面板
+        buttons = new JButton[buttonArr.length];// 创建按钮
+
+        frame.setBounds(700, 188, 490, 580);  // 设置窗口的位置尺寸
+        textField.setBounds(10, 15, 465, 90);  // 文本框的位置尺寸
+        textField.setFont(new Font("宋体", Font.BOLD, 60));// 设置文本框的字体：字体，粗细，大小
+        textField.setBackground(new Color(119, 136, 153));
+
+        panel.setBackground(new Color(135, 206, 250));
+        panel.setBounds(10, 130, 465, 400);  // 面板的位置尺寸
+        panel.setLayout(new GridLayout(5, 4, 20, 20));    // 网格布局
+
+        frame.add(textField);                               // 文本框添加在窗口里
+        frame.add(panel);                                   // 面板添加到窗口里
+
+        // 创建按钮并添加到面板
+        for (int i = 0; i < buttonArr.length; i++) {
+            int index = i;
+            buttons[i] = new JButton(buttonArr[i]);
+            panel.add(buttons[i]);
+            buttons[i].setFont(new Font("宋体", Font.BOLD, 35));
+            buttons[i].setBackground(new Color(135, 206, 235));
+
+            // 添加鼠标点击事件监听器
+            buttons[i].addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    input(buttons[index].getText());
+                }
+            });
+        }
+
+        frame.setResizable(false);
+        frame.setLayout(null);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    // 处理按钮输入
+    public void input(String v) {
+        switch (v) {
+            case "1": case "2": case "3": case "4": case "5":
+            case "6": case "7": case "8": case "9": case "0":
+                information += v;
+                textField.setText(information);
+                break;
+            case ".":
+                information += ".";
+                textField.setText(information);
+                break;
+            case "C":
+                information = "";
+                textField.setText(information);
+                break;
+            case "DEL":
+                if (!information.isEmpty()) {
+                    information = information.substring(0, information.length() - 1);
+                    textField.setText(information);
+                }
+                break;
+            case "+/-":
+                if (!information.isEmpty()) {
+                    double num = Double.parseDouble(information);
+                    num = -num;
+                    information = String.valueOf(num);
+                    textField.setText(information);
+                }
+                break;
+            case "%":
+                if (!information.isEmpty()) {
+                    double num = Double.parseDouble(information);
+                    num /= 100;
+                    information = String.valueOf(num);
+                    textField.setText(information);
+                }
+                break;
+            case "+": case "-": case "×": case "÷":
+                information += v;
+                operate = v;
+                textField.setText(information);
+                break;
+            case "=":
+                if (!information.isEmpty() && information.contains(operate)) {
+                    String[] operands = information.split(operate);
+                    a = operands[0];
+                    b = operands[1];
+                    result();
+                    textField.setText(information);
+                }
+                break;
+        }
+    }
+
+    // 执行计算
+    public void result() {
+        switch (operate) {
+            case "+":
+                result = Double.parseDouble(a) + Double.parseDouble(b);
+                information = String.valueOf(result);
+                break;
+            case "-":
+                result = Double.parseDouble(a) - Double.parseDouble(b);
+                information = String.valueOf(result);
+                break;
+            case "×":
+                result = Double.parseDouble(a) * Double.parseDouble(b);
+                information = String.valueOf(result);
+                break;
+            case "÷":
+                if (!b.equals("0")) {
+                    result = Double.parseDouble(a) / Double.parseDouble(b);
+                    information = String.valueOf(result);
+                } else {
+                    information = "错误"; // 除零错误处理
+                }
+                break;
+        }
+    }
+
+    public static void main(String[] args) {
+        Calculator calculator = new Calculator();
+        calculator.init();
+    }
+}
